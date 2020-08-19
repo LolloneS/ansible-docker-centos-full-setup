@@ -14,13 +14,10 @@
     * automatically add (remove) each new (deleted) VM's hostname to (from) the `/etc/hosts` file 
 * ansible-lint: `pip install ansible-lint`
 
-
 Additional tools:
 * (yamllint)[https://github.com/adrienverge/yamllint]: used for linting the YAML files in the repository
 
-
 ## Information of interest
-
 ### Directory layout
 The directory layout follows the best practices as per the [documentation](https://docs.ansible.com/ansible/latest/user_guide/playbooks_best_practices.html).
 
