@@ -1,5 +1,7 @@
 # ansible-challenge
 
+[![Build Status](https://travis-ci.com/LolloneS/ansible-experiment.svg?branch=master)](https://travis-ci.com/LolloneS/ansible-experiment)
+
 ## Prerequisites
 
 > Beware that all of the following relies on Python 3. In other words, the Ansible version that's being used is the Python3 version, `pip` is an alias for `pip3`, etcetera. Python 2 is *not* being used.
