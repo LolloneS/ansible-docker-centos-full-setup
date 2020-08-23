@@ -12,7 +12,7 @@ Vagrant.configure("2") do |config|
   config.vm.box = "centos/8"
   config.vm.box_version = "1905.1"
   config.disksize.size = '50GB'
- 
+
   {
     'vm1' => '192.168.33.10',
     'vm2' => '192.168.33.11',
@@ -31,6 +31,6 @@ Vagrant.configure("2") do |config|
         echo #{ssh_pub_key} >> /root/.ssh/authorized_keys
       SHELL
     end
-  
+
   end
 end
