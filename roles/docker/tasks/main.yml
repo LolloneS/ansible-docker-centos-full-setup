@@ -1,0 +1,62 @@
+---
+- include_tasks: docker-init-centos.yml
+  when: ansible_distribution == 'CentOS'
+
+- name: Install containerd.io
+  yum:
+    name: "https://download.docker.com/linux/centos/7/x86_64/stable/Packages/containerd.io-{{ containerd_version }}.el7.x86_64.rpm"
+    state: present
+
+- name: Install Docker
+  yum:
+    name: "{{ item.name }}-{{ item.version }}"
+    state: present
+  loop:
+    - {name: "docker-{{ docker_edition }}", version: "{{ docker_version }}" }
+    - {name: "docker-{{ docker_edition }}-cli", version: "{{ docker_version }}" }
+
+- name: Ensure Docker is started and enabled at boot.
+  service:
+    name: docker
+    state: started
+    enabled: true
+
+- name: Ensure handlers are notified now to avoid firewall conflicts.
+  meta: flush_handlers
+
+- name: Set up docker-compose
+  include_tasks: docker-compose.yml
+  when: docker_install_compose | bool
+
+- name: Set up docker users
+  include_tasks: docker-users.yml
+  when: docker_users | length > 0
+
+- name: Remove Docker related cron jobs
+  file:
+    path: "/etc/cron.d/{{ item.cron_file }}"
+    state: "absent"
+  loop: "{{ docker_cron_jobs }}"
+  when:
+    - item.state | d("present") == "absent"
+    - item.cron_file | d()
+
+- name: Create Docker related cron jobs
+  cron:
+    name: "{{ item.name }}"
+    job: "{{ item.job }}"
+    minute: "{{ item.schedule[0] }}"
+    hour: "{{ item.schedule[1] }}"
+    day: "{{ item.schedule[2] }}"
+    month: "{{ item.schedule[3] }}"
+    weekday: "{{ item.schedule[4] }}"
+    cron_file: "{{ item.cron_file }}"
+    user: "{{ item.user | d('root') }}"
+  loop: "{{ docker_cron_jobs }}"
+  when:
+    - item.state | d("present") != "absent"
+    - item.name | d() and item.job | d()
+    - item.schedule | d() and item.cron_file | d()
+
+- name: Expose Docker daemon API
+  include_tasks: docker-expose-api.yml

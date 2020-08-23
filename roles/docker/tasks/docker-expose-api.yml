@@ -1,0 +1,23 @@
+---
+- name: Create folder for Docker's systemd configuration files
+  file:
+    path: /etc/systemd/system/docker.service.d/
+    state: directory
+    mode: 0755
+
+
+- name: Create configuration file to expose Docker daemon API
+  copy:
+    force: no
+    mode: 0644
+    dest: /etc/systemd/system/docker.service.d/docker-external.conf
+    content: |
+        [Service]
+        ExecStart=
+        ExecStart=/usr/bin/dockerd -H tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock
+
+- name: Reload daemon and restart Docker service
+  systemd:
+    daemon_reload: yes
+    state: restarted
+    name: docker

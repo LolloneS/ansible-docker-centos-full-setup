@@ -1,0 +1,9 @@
+---
+- name: Ensure github.com is a known host
+    lineinfile:
+    dest: /root/.ssh/known_hosts
+    create: yes
+    state: present
+    line: ""
+    regexp: "^github\\.com"
+    mode: 0600

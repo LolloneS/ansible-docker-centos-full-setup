@@ -1,0 +1,6 @@
+- hosts: local
+  tasks:
+    - import_role:
+        name: preliminaries
+    - import_role:
+        name: docker
