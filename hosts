@@ -1,3 +1,5 @@
-[local]
+[manager]
 vm1.myapp.dev
+
+[workers]
 vm2.myapp.dev
