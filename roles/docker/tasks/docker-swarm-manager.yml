@@ -1,0 +1,19 @@
+---
+- name: Initalize a new Docker swarm
+  docker_swarm:
+    state: present
+    advertise_addr: "{{ manager_ip }}"
+  register: init_result
+  when: "'{{ manager_ip }}' in ansible_all_ipv4_addresses"
+
+- name: Get info on Docker Swarm
+  docker_swarm_info:
+  ignore_errors: yes
+  register: result
+
+- name: Inform about basic flags
+  debug:
+    msg: |
+      Was able to talk to docker daemon: {{ result.can_talk_to_docker }}
+      Docker in Swarm mode: {{ result.docker_swarm_active }}
+      This is a Manager node: {{ result.docker_swarm_manager }}

@@ -15,7 +15,7 @@
 * ansible-lint: `pip install ansible-lint`
 
 Additional tools:
-* (yamllint)[https://github.com/adrienverge/yamllint]: used for linting the YAML files in the repository
+* [yamllint](https://github.com/adrienverge/yamllint): used for linting the YAML files in the repository
 
 ## Information of interest
 ### Directory layout
@@ -23,3 +23,17 @@ The directory layout follows the best practices as per the [documentation](https
 
 ### Local testing
 In order to test the code locally, I rely on Vagrant to spin up two CentOS VMs as per the specification, basically copying what can be found [here](https://www.hamvocke.com/blog/local-ansible-testing/). In particular, `ansible.cfg` and `Vagrantfile` are both heavily inspired from the blog post.
+
+### Docker setup
+Docker is set up entirely using Ansible. The `docker` role is an adaptation of [this](https://github.com/geerlingguy/ansible-role-docker) work.
+
+### Running the playbook
+1. Create the Virtual Machines according to the Vagrantfile by running `vagrant up`
+2. 
+
+## TODO
+* Automatic partition/filesystem expansion when creating VMs (either using Vagrant or Ansible)
+* *Safely* expose the Docker daemon (TLS certificate)
+* Improve the way Docker Swarm is deployed
+* Test tasks with Molecule
+* Remove conditional `{{ manager_ip }}` in Docker swarm setup

@@ -1,0 +1,32 @@
+---
+# Docker edition: "ce" (Community) or "ee" (Enterprise)
+docker_edition: "ce"
+
+# Pin versions
+docker_version: 19.03.12
+containerd_version: "1.2.6-3.3"
+docker_compose_version: 1.26.2
+
+# Docker Compose options
+docker_install_compose: true
+docker_compose_path: /usr/local/bin/docker-compose
+
+# YUM references
+docker_yum_repo_url: https://download.docker.com/linux/centos/docker-{{ docker_edition }}.repo
+docker_yum_gpg_key: https://download.docker.com/linux/centos/gpg
+
+# List of users to be added to the docker group
+docker_users: ["vagrant"]
+
+# Cron jobs
+docker_cron_jobs_prune_flags: "af"
+docker_cron_jobs_prune_schedule: ["0", "0", "*", "*", "0"]
+docker_cron_jobs:
+  - name: "Docker disk clean up"
+    job: "docker system prune -{{ docker_cron_jobs_prune_flags }} > /dev/null 2>&1"
+    schedule: "{{ docker_cron_jobs_prune_schedule }}"
+    cron_file: "docker-disk-clean-up"
+    user: "{{ (docker_users | first) | d('root') }}"
+
+# IP of the manager node
+manager_ip: "192.168.33.10"
