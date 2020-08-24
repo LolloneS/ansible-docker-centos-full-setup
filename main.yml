@@ -1,4 +1,5 @@
-- hosts: local
+---
+- hosts: all
   tasks:
     - import_role:
         name: preliminaries

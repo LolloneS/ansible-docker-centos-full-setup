@@ -5,3 +5,7 @@
     groups: docker
     append: true
   with_items: "{{ docker_users }}"
+  notify: Restart Docker
+
+- name: Force Docker restart now
+  meta: flush_handlers

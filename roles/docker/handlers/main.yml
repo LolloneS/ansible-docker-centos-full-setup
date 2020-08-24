@@ -3,5 +3,3 @@
   service:
     name: docker
     state: restarted
-
-    # TODO bisogna chiamarlo!

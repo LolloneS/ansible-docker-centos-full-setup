@@ -2,6 +2,16 @@
 - include_tasks: docker-init-centos.yml
   when: ansible_distribution == 'CentOS'
 
+- name: Install python3
+  yum:
+    update_cache: yes
+    name: python3
+    state: present
+
+- name: Install Docker via Pip
+  pip:
+    name: docker
+
 - name: Install containerd.io
   yum:
     name: "https://download.docker.com/linux/centos/7/x86_64/stable/Packages/containerd.io-{{ containerd_version }}.el7.x86_64.rpm"
@@ -12,8 +22,8 @@
     name: "{{ item.name }}-{{ item.version }}"
     state: present
   loop:
-    - {name: "docker-{{ docker_edition }}", version: "{{ docker_version }}" }
-    - {name: "docker-{{ docker_edition }}-cli", version: "{{ docker_version }}" }
+    - {name: "docker-{{ docker_edition }}", version: "{{ docker_version }}"}
+    - {name: "docker-{{ docker_edition }}-cli", version: "{{ docker_version }}"}
 
 - name: Ensure Docker is started and enabled at boot.
   service:
@@ -60,3 +70,6 @@
 
 - name: Expose Docker daemon API
   include_tasks: docker-expose-api.yml
+
+- name: Initialize a new Docker swarm
+  include_tasks: docker-swarm.yml

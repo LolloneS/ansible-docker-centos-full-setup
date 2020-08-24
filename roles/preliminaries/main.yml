@@ -1,6 +1,6 @@
 ---
 - name: Ensure github.com is a known host
-    lineinfile:
+  lineinfile:
     dest: /root/.ssh/known_hosts
     create: yes
     state: present
