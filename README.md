@@ -29,7 +29,7 @@ Docker is set up entirely using Ansible. The `docker` role is an adaptation of [
 
 ### Running the playbook
 1. Create the Virtual Machines according to the Vagrantfile by running `vagrant up`
-2. 
+2. Run the playbook with `ansible-playbook -i hosts main.yml`
 
 ## TODO
 * Automatic partition/filesystem expansion when creating VMs (either using Vagrant or Ansible)
