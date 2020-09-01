@@ -32,7 +32,6 @@ Docker is set up entirely using Ansible. The `docker` role is an adaptation of [
 2. Run the playbook with `ansible-playbook -i hosts main.yml`
 
 ## TODO
-* Automatic partition/filesystem expansion when creating VMs (either using Vagrant or Ansible)
 * *Safely* expose the Docker daemon (TLS certificate)
 * Improve the way Docker Swarm is deployed
 * Test tasks with Molecule

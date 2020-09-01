@@ -13,6 +13,27 @@ Vagrant.configure("2") do |config|
   config.vm.box_version = "1905.1"
   config.disksize.size = '50GB'
 
+  config.vm.provision :shell, :inline => <<-SCRIPT
+    parted /dev/sda ---pretend-input-tty &> /dev/null <<EOF
+    resizepart
+    1
+    Yes
+    100%
+    quit
+    mount -a
+EOF
+  SCRIPT
+
+  config.vm.provision "shell" do |s|
+    ssh_pub_key = File.readlines("#{Dir.home}/.ssh/id_rsa.pub").first.strip
+    s.inline = <<-SHELL
+      mkdir -p /root/.ssh/
+      touch /root/.ssh/authorized_keys
+      echo #{ssh_pub_key} >> /home/vagrant/.ssh/authorized_keys
+      echo #{ssh_pub_key} >> /root/.ssh/authorized_keys
+    SHELL
+  end
+
   {
     'vm1' => '192.168.33.10',
     'vm2' => '192.168.33.11',
@@ -21,16 +42,5 @@ Vagrant.configure("2") do |config|
       host.vm.network 'private_network', ip: ip
       host.vm.hostname = "#{short_name}.myapp.dev"
     end
-
-    config.vm.provision "shell" do |s|
-      ssh_pub_key = File.readlines("#{Dir.home}/.ssh/id_rsa.pub").first.strip
-      s.inline = <<-SHELL
-        mkdir -p /root/.ssh/
-        touch /root/.ssh/authorized_keys
-        echo #{ssh_pub_key} >> /home/vagrant/.ssh/authorized_keys
-        echo #{ssh_pub_key} >> /root/.ssh/authorized_keys
-      SHELL
-    end
-
   end
 end
