@@ -32,7 +32,8 @@ Docker is set up entirely using Ansible. The `docker` role is an adaptation of [
 2. Run the playbook with `ansible-playbook -i hosts main.yml`
 
 ## TODO
-* *Safely* expose the Docker daemon (TLS certificate)
+* Add modularity via `defaults` (e.g. for certs' and keys' filenames)
+* Parametrize the copy of certs and keys from `docker-tls.yml` per host
 * Improve the way Docker Swarm is deployed
 * Test tasks with Molecule
 * Remove conditional `{{ manager_ip }}` in Docker swarm setup

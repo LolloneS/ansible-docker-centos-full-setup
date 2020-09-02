@@ -13,7 +13,13 @@
     content: |
         [Service]
         ExecStart=
-        ExecStart=/usr/bin/dockerd -H tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock
+        ExecStart=/usr/bin/dockerd \
+                  --tlsverify \
+                  --tlscacert=/etc/ssl/certs/ca-ansible.crt \
+                  --tlscert=/etc/ssl/certs/server-cert.crt \
+                  --tlskey=/etc/ssl/private/server-key.pem \
+                  -H tcp://0.0.0.0:2376 \
+                  -H unix:///var/run/docker.sock
 
 - name: Reload daemon and restart Docker service
   systemd:

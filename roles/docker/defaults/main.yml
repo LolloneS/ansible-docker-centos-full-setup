@@ -28,5 +28,10 @@ docker_cron_jobs:
     cron_file: "docker-disk-clean-up"
     user: "{{ (docker_users | first) | d('root') }}"
 
-# IP of the manager node
+# IP of the manager node, as per the Vagrantfile
 manager_ip: "192.168.33.10"
+
+# Local destination folders for the copied TLS certs and RSA keys
+# certs_folder: "/etc/ssl/certs/"
+certs_folder: "/tmp/"
+keys_folder: "/tmp/"
