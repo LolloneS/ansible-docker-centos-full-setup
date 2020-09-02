@@ -1,4 +1,16 @@
 ---
+- name: Install python3
+  yum:
+    update_cache: yes
+    name: python3
+    state: present
+
+- name: Install OpenSSL
+  yum:
+    update_cache: yes
+    name: openssl
+    state: present
+
 - name: Ensure github.com is a known host
   lineinfile:
     dest: /root/.ssh/known_hosts

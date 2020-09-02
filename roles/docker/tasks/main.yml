@@ -2,12 +2,6 @@
 - include_tasks: docker-init-centos.yml
   when: ansible_distribution == 'CentOS'
 
-- name: Install python3
-  yum:
-    update_cache: yes
-    name: python3
-    state: present
-
 - name: Install Docker via Pip
   pip:
     name: docker
@@ -67,6 +61,9 @@
     - item.state | d("present") != "absent"
     - item.name | d() and item.job | d()
     - item.schedule | d() and item.cron_file | d()
+
+- name: Generate TLS stuff for safely exposing the Docker daemon API
+  include_tasks: docker-tls.yml
 
 - name: Expose Docker daemon API
   include_tasks: docker-expose-api.yml

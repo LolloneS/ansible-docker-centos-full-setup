@@ -1,14 +1,4 @@
 ---
-- name: Install python3
-  yum:
-    update_cache: yes
-    name: python3
-    state: present
-
-- name: Install Docker via Pip
-  pip:
-    name: docker
-
 - name: Include task to set up the swarm's manager
   include_tasks: docker-swarm-manager.yml
   when: "'{{ manager_ip }}' in ansible_all_ipv4_addresses"
