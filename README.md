@@ -31,9 +31,13 @@ Docker is set up entirely using Ansible. The `docker` role is an adaptation of [
 1. Create the Virtual Machines according to the Vagrantfile by running `vagrant up`
 2. Run the playbook with `ansible-playbook -i hosts main.yml`
 
+### Safely connecting to Docker
+The connection to the remote Docker host is secure by default. This requires the client to have a certificate and a key that are recognized and validated by the remote Docker host. The [docker-tls.yml](roles/docker/tasks/docker-tls.yml) file copies these files to the local `certs_folder` and `keys_folder` directories defined in the `docker` role's `defaults`. When connecting to the remote Docker host, pass the copied file as follows:
+```docker --tlsverify --tlscacert=/path/to/ca-ansible.crt --tlscert=/path/to/client-cert.crt --tlskey=/path/to/client-key.pem -H=REMOTE_HOST:2376 version```
+where `REMOTE_HOST` is, in this case, either vm1.myapp.dev or vm2.myapp.dev. Notice that these must match the Common Names used when creating the certificates in [docker-tls.yml](roles/docker/tasks/docker-tls.yml), as per the [documentation](https://docs.docker.com/engine/security/https/).
+
 ## TODO
-* Add modularity via `defaults` (e.g. for certs' and keys' filenames)
-* Parametrize the copy of certs and keys from `docker-tls.yml` per host
+* Parametrize the copy of certs and keys from [docker-tls.yml](roles/docker/tasks/docker-tls.yml) on a per-host basis
 * Improve the way Docker Swarm is deployed
 * Test tasks with Molecule
 * Remove conditional `{{ manager_ip }}` in Docker swarm setup

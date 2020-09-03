@@ -11,27 +11,27 @@
 
 - name: Generate an RSA 4096bit private key for the CA
   openssl_privatekey:
-    path: /etc/ssl/private/ca-key.pem
+    path: "/etc/ssl/private/{{ ca_key }}.pem"
 
 - name: Generate an OpenSSL Certificate Signing Request for the CA
   openssl_csr:
     path: /etc/ssl/csr/ca.csr
-    privatekey_path: /etc/ssl/private/ca-key.pem
+    privatekey_path: "/etc/ssl/private/{{ ca_key }}.pem"
     common_name: "{{ inventory_hostname }}"
     basic_constraints: "CA:TRUE"
     mode: 0666
 
 - name: Generate a self-signed certificate for the CA
   openssl_certificate:
-    path: /etc/ssl/certs/ca-ansible.crt
-    privatekey_path: /etc/ssl/private/ca-key.pem
+    path: "/etc/ssl/certs/{{ ca_cert }}.crt"
+    privatekey_path: "/etc/ssl/private/{{ ca_key }}.pem"
     csr_path: /etc/ssl/csr/ca.csr
     provider: selfsigned
     mode: 0666
 
 - name: Generate an RSA 4096bit private key for the server
   openssl_privatekey:
-    path: /etc/ssl/private/server-key.pem
+    path: "/etc/ssl/private/{{ server_key }}.pem"
 
 - name: Get the current host's set of IPs
   set_fact:
@@ -40,7 +40,7 @@
 - name: Generate an OpenSSL Certificate Signing Request for the server
   openssl_csr:
     path: /etc/ssl/csr/server.csr
-    privatekey_path: /etc/ssl/private/server-key.pem
+    privatekey_path: "/etc/ssl/private/{{ server_key }}.pem"
     extended_key_usage: serverAuth
     common_name: "{{ inventory_hostname }}"
     subject_alt_name: "{{ subjectAltName }}"
@@ -48,34 +48,34 @@
 
 - name: Generate the signed certificate for the server
   openssl_certificate:
-    path: /etc/ssl/certs/server-cert.crt
+    path: "/etc/ssl/certs/{{ server_cert }}.crt"
     csr_path: /etc/ssl/csr/server.csr
-    privatekey_path: /etc/ssl/private/server-key.pem
+    privatekey_path: "/etc/ssl/private/{{ server_key }}.pem"
     provider: ownca
-    ownca_path: /etc/ssl/certs/ca-ansible.crt
-    ownca_privatekey_path: /etc/ssl/private/ca-key.pem
+    ownca_path: "/etc/ssl/certs/{{ ca_cert }}.crt"
+    ownca_privatekey_path: "/etc/ssl/private/{{ ca_key }}.pem"
     mode: 0666
 
 - name: Generate an RSA 4096bit private key for the client
   openssl_privatekey:
-    path: /etc/ssl/private/key.pem
+    path: "/etc/ssl/private/{{ client_key }}.pem"
 
 - name: Generate an OpenSSL Certificate Signing Request for the client
   openssl_csr:
     path: /etc/ssl/csr/client.csr
-    privatekey_path: /etc/ssl/private/key.pem
+    privatekey_path: /etc/ssl/private/{{ client_key }}.pem
     extended_key_usage: clientAuth
     mode: 0666
     common_name: "client"
 
 - name: Generate the signed certificate for the client
   openssl_certificate:
-    path: /etc/ssl/certs/client-cert.crt
+    path: "/etc/ssl/certs/{{ client_cert }}.crt"
     csr_path: /etc/ssl/csr/client.csr
-    privatekey_path: /etc/ssl/private/key.pem
+    privatekey_path: /etc/ssl/private/{{ client_key }}.pem
     provider: ownca
-    ownca_path: /etc/ssl/certs/ca-ansible.crt
-    ownca_privatekey_path: /etc/ssl/private/ca-key.pem
+    ownca_path: "/etc/ssl/certs/{{ ca_cert }}.crt"
+    ownca_privatekey_path: "/etc/ssl/private/{{ ca_key }}.pem"
     mode: 0666
 
 - name: Delete CSR files
@@ -92,33 +92,33 @@
     path: "/etc/ssl/private/{{ item }}.pem"
     mode: 0400
   loop:
-    - ca-key
-    - key
-    - server-key
+    - "{{ ca_key }}"
+    - "{{ client_key }}"
+    - "{{ server_key }}"
 
 - name: Secure certificates
   file:
     path: "/etc/ssl/certs/{{ item }}.crt"
     mode: 0444
   loop:
-    - ca-ansible
-    - client-cert
-    - server-cert
+    - "{{ ca_cert }}"
+    - "{{ client_cert }}"
+    - "{{ server_cert }}"
 
 - name: Fetch client files and copy them to local folder
   fetch:
     src: "/etc/ssl/certs/{{ item }}.crt"
-    dest: "{{ certs_folder }}"  # FIXME: parametrize per host
+    dest: "{{ certs_folder }}/"  # FIXME: parametrize per host
     flat: yes
   loop:
-    - "ca-ansible"
-    - "client-cert"
+    - "{{ ca_cert }}"
+    - "{{ client_cert }}"
   when: "'{{ manager_ip }}' in ansible_all_ipv4_addresses"  # FIXME
 
 
 - name: Fetch client files and copy them to local folder
   fetch:
-    src: "/etc/ssl/private/key.pem"
-    dest: "{{ keys_folder }}"  # FIXME: parametrize per host
+    src: "/etc/ssl/private/{{ client_key }}.pem"
+    dest: "{{ keys_folder }}/"  # FIXME: parametrize per host
     flat: yes
   when: "'{{ manager_ip }}' in ansible_all_ipv4_addresses"  # FIXME

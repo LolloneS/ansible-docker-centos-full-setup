@@ -1,7 +1,7 @@
 ---
 - name: Create folder for Docker's systemd configuration files
   file:
-    path: /etc/systemd/system/docker.service.d/
+    path: "{{ dockerd_conf_folder }}"
     state: directory
     mode: 0755
 
@@ -9,15 +9,15 @@
   copy:
     force: no
     mode: 0644
-    dest: /etc/systemd/system/docker.service.d/docker-external.conf
+    dest: "{{ dockerd_conf_folder }}/docker-external.conf"
     content: |
         [Service]
         ExecStart=
         ExecStart=/usr/bin/dockerd \
                   --tlsverify \
-                  --tlscacert=/etc/ssl/certs/ca-ansible.crt \
-                  --tlscert=/etc/ssl/certs/server-cert.crt \
-                  --tlskey=/etc/ssl/private/server-key.pem \
+                  --tlscacert=/etc/ssl/certs/{{ ca_cert }}.crt \
+                  --tlscert=/etc/ssl/certs/{{ server_cert }}.crt \
+                  --tlskey=/etc/ssl/private/{{ server_key }}.pem \
                   -H tcp://0.0.0.0:2376 \
                   -H unix:///var/run/docker.sock
 

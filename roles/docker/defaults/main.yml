@@ -28,10 +28,22 @@ docker_cron_jobs:
     cron_file: "docker-disk-clean-up"
     user: "{{ (docker_users | first) | d('root') }}"
 
+# Folder for dockerd config files
+dockerd_conf_folder: "/etc/systemd/system/docker.service.d"
+
 # IP of the manager node, as per the Vagrantfile
 manager_ip: "192.168.33.10"
 
+# Filenames for keys and certificates
+ca_cert: ca-ansible
+ca_key: ca-key
+
+client_cert: client-cert
+client_key: client-key
+
+server_cert: server-cert
+server_key: server-key
+
 # Local destination folders for the copied TLS certs and RSA keys
-# certs_folder: "/etc/ssl/certs/"
-certs_folder: "/tmp/"
-keys_folder: "/tmp/"
+certs_folder: "/tmp"
+keys_folder: "/tmp"
