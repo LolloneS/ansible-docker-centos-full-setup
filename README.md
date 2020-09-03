@@ -1,6 +1,16 @@
-# ansible-challenge
+# Ansible Docker setup
 
 [![Build Status](https://travis-ci.com/LolloneS/ansible-experiment.svg?branch=master)](https://travis-ci.com/LolloneS/ansible-experiment)
+
+## What?
+This repository automatically configures 2 (but you can modify it to configure *n*) CentOS VMs and does the following:
+* expand the VMs' disks and filesystems to have enough free space (defined as 40GB)
+* install Docker, docker-compose on the VMs
+* install Docker swarm and set up a node as the master, the others as slaves
+* safely expose the Docker daemon APIs via TLS and provide the user with the keys and CA certificate needed for secure connection
+
+Want to try it? Just run `vagrant up && ansible-playbook -i hosts main.yml` and enjoy!
+
 
 ## Prerequisites
 
@@ -41,3 +51,4 @@ where `REMOTE_HOST` is, in this case, either vm1.myapp.dev or vm2.myapp.dev. Not
 * Improve the way Docker Swarm is deployed
 * Test tasks with Molecule
 * Remove conditional `{{ manager_ip }}` in Docker swarm setup
+* Change VM disk size if empty space is not 40GB
