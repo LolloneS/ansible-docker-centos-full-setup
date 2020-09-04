@@ -24,3 +24,86 @@
     owner: root
     group: root
     mode: 0644
+
+- name: Install Docker via Pip
+  pip:
+    name: docker
+
+- name: Install containerd.io
+  yum:
+    name: "https://download.docker.com/linux/centos/7/x86_64/stable/Packages/containerd.io-{{ containerd_version }}.el7.x86_64.rpm"
+    state: present
+
+- name: Install Docker
+  yum:
+    name: "{{ item.name }}-{{ item.version }}"
+    state: present
+  loop:
+    - {name: "docker-{{ docker_edition }}", version: "{{ docker_version }}"}
+    - {name: "docker-{{ docker_edition }}-cli", version: "{{ docker_version }}"}
+
+- name: Ensure Docker is started and enabled at boot.
+  service:
+    name: docker
+    state: started
+    enabled: true
+
+- name: Ensure handlers are notified now to avoid firewall conflicts.
+  meta: flush_handlers
+
+- name: Check current docker-compose version
+  command: docker-compose --version
+  register: docker_compose_current_version
+  changed_when: false
+  failed_when: false
+
+- name: Delete existing docker-compose version if it's different
+  file:
+    path: "{{ docker_compose_path }}"
+    state: absent
+  when: >
+    docker_compose_current_version.stdout is defined
+    and docker_compose_version not in docker_compose_current_version.stdout
+
+- name: Install Docker Compose
+  get_url:
+    url: https://github.com/docker/compose/releases/download/{{ docker_compose_version }}/docker-compose-Linux-x86_64
+    dest: "{{ docker_compose_path }}"
+    mode: 0755
+
+- name: Ensure docker users are added to the docker group.
+  user:
+    name: "{{ item }}"
+    groups: docker
+    append: true
+  with_items: "{{ docker_users }}"
+  notify: Restart Docker
+
+- name: Force Docker restart now
+  meta: flush_handlers
+
+- name: Remove Docker related cron jobs
+  file:
+    path: "/etc/cron.d/{{ item.cron_file }}"
+    state: "absent"
+  loop: "{{ docker_cron_jobs }}"
+  when:
+    - item.state | d("present") == "absent"
+    - item.cron_file | d()
+
+- name: Create Docker related cron jobs
+  cron:
+    name: "{{ item.name }}"
+    job: "{{ item.job }}"
+    minute: "{{ item.schedule[0] }}"
+    hour: "{{ item.schedule[1] }}"
+    day: "{{ item.schedule[2] }}"
+    month: "{{ item.schedule[3] }}"
+    weekday: "{{ item.schedule[4] }}"
+    cron_file: "{{ item.cron_file }}"
+    user: "{{ item.user | d('root') }}"
+  loop: "{{ docker_cron_jobs }}"
+  when:
+    - item.state | d("present") != "absent"
+    - item.name | d() and item.job | d()
+    - item.schedule | d() and item.cron_file | d()

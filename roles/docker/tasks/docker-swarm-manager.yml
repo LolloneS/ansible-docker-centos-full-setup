@@ -1,10 +1,14 @@
 ---
+- name: Determine whether the current node is the manager
+  set_fact:
+    is_manager: "{% if manager_ip in ansible_all_ipv4_addresses %}true{% else %}false{% endif %}"
+
 - name: Initalize a new Docker swarm
   docker_swarm:
     state: present
     advertise_addr: "{{ manager_ip }}"
   register: init_result
-  when: "'{{ manager_ip }}' in ansible_all_ipv4_addresses"
+  when: is_manager|bool
 
 - name: Get info on Docker Swarm
   docker_swarm_info:
