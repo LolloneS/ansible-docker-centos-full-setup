@@ -47,7 +47,7 @@ The connection to the remote Docker host is secure by default. This requires the
 where `REMOTE_HOST` is, in this case, either vm1.myapp.dev or vm2.myapp.dev. Notice that these must match the Common Names used when creating the certificates in [docker-tls.yml](roles/docker/tasks/docker-tls.yml), as per the [documentation](https://docs.docker.com/engine/security/https/).
 
 ## TODO
-* Parametrize the copy of certs and keys from [docker-tls.yml](roles/docker/tasks/docker-tls.yml) on a per-host basis
+* Choose whether to create a single CA for all hosts
 * Improve the way Docker Swarm is deployed
 * Test tasks with Molecule
 * Remove conditional `{{ manager_ip }}` in Docker swarm setup
