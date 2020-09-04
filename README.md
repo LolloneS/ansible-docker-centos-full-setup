@@ -48,7 +48,5 @@ where `REMOTE_HOST` is, in this case, either vm1.myapp.dev or vm2.myapp.dev. Not
 
 ## TODO
 * Choose whether to create a single CA for all hosts
-* Improve the way Docker Swarm is deployed
 * Test tasks with Molecule
-* Remove conditional `{{ manager_ip }}` in Docker swarm setup
 * Change VM disk size if empty space is not 40GB
