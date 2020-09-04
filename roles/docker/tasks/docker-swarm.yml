@@ -1,7 +1,11 @@
 ---
+- name: Determine whether the current node is the manager
+  set_fact:
+    is_manager: "{% if manager_ip in ansible_all_ipv4_addresses %}true{% else %}false{% endif %}"
+
 - name: Include task to set up the swarm's manager
   include_tasks: docker-swarm-manager.yml
-  when: "'{{ manager_ip }}' in ansible_all_ipv4_addresses"
+  when: is_manager|bool
 
 - name: Save token needed to join swarm
   set_fact:
@@ -9,7 +13,7 @@
   delegate_to: "{{ item }}"
   delegate_facts: True
   loop: "{{ groups['workers'] }}"
-  when: "'{{ manager_ip }}' in ansible_all_ipv4_addresses"
+  when: (is_manager|bool) and (init_result is defined)
 
 - name: Add nodes to Docker swarm
   docker_swarm:
@@ -17,4 +21,4 @@
     advertise_addr: "{{ manager_ip }}"
     join_token: "{{ join_token_worker }}"
     remote_addrs: "{{ manager_ip }}:2377"
-  when: "'{{ manager_ip }}' not in ansible_all_ipv4_addresses"
+  when: (not is_manager|bool) and (join_token_worker is defined)
