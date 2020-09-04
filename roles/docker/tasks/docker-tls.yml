@@ -105,20 +105,26 @@
     - "{{ client_cert }}"
     - "{{ server_cert }}"
 
-- name: Fetch client files and copy them to local folder
+- name: Create a folder for each host's keys and certificates
+  file:
+    path: "{{ item }}/{{ inventory_hostname }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - "{{ certs_folder }}"
+    - "{{ keys_folder }}"
+
+- name: Fetch client and CA certificates and copy them to local folder
   fetch:
     src: "/etc/ssl/certs/{{ item }}.crt"
-    dest: "{{ certs_folder }}/"  # FIXME: parametrize per host
+    dest: "{{ certs_folder }}/{{ inventory_hostname }}/"
     flat: yes
   loop:
     - "{{ ca_cert }}"
     - "{{ client_cert }}"
-  when: "'{{ manager_ip }}' in ansible_all_ipv4_addresses"  # FIXME
 
-
-- name: Fetch client files and copy them to local folder
+- name: Fetch client private key and copy it to local folder
   fetch:
     src: "/etc/ssl/private/{{ client_key }}.pem"
-    dest: "{{ keys_folder }}/"  # FIXME: parametrize per host
+    dest: "{{ keys_folder }}/{{ inventory_hostname }}/"
     flat: yes
-  when: "'{{ manager_ip }}' in ansible_all_ipv4_addresses"  # FIXME
