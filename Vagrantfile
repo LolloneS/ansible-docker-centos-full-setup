@@ -13,17 +13,6 @@ Vagrant.configure("2") do |config|
   config.vm.box_version = "1905.1"
   config.disksize.size = '50GB'
 
-  config.vm.provision :shell, :inline => <<-SCRIPT
-    parted /dev/sda ---pretend-input-tty &> /dev/null <<EOF
-    resizepart
-    1
-    Yes
-    100%
-    quit
-    mount -a
-EOF
-  SCRIPT
-
   config.vm.provision "shell" do |s|
     ssh_pub_key = File.readlines("#{Dir.home}/.ssh/id_rsa.pub").first.strip
     s.inline = <<-SHELL

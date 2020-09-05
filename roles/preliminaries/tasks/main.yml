@@ -1,4 +1,28 @@
 ---
+- name: Get volume being used
+  set_fact:
+    mount: "{{ ansible_mounts | first }}"
+
+- name: Get free space on the main partition
+  set_fact:
+    free_space: "{{ mount.size_available|float / 1000000000 }}"
+
+- name: Resize partition if available space is less than 40GB
+  shell: |
+    parted /dev/sda ---pretend-input-tty &> /dev/null <<EOF
+    resizepart
+    1
+    Yes
+    100%
+    quit
+    mount -a
+    EOF
+  when: free_space|int < 40
+
+- name: Resize file system if available space is less than 40GB
+  shell: "xfs_growfs /"
+  when: free_space|int < 40
+
 - name: Install python3
   yum:
     update_cache: yes
